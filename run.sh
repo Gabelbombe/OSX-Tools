@@ -21,7 +21,7 @@ function run ()
     tell application "Terminal"
       activate
       do script with command "
-        cd ~/Eclipse/CVSZR/Filson/setup/_run/filson.com/zrmacdev/
+        cd $F_PATH
 
         netextender 72.175.244.2:4433   \
             --username=$F_USER          \
