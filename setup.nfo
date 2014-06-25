@@ -1,0 +1,142 @@
+Steps
+
+##Install brew
+ruby -e "$(curl -fsSL https://raw.github.com/mxcl/homebrew/go)"
+
+##Locate JavaVM
+export JAVA_HOME=$(/usr/libexec/java_home)
+
+#Install Maven
+brew install maven
+
+#Install GIT
+brew install git
+
+##Purge old apache
+for pid in $(ps aux |grep httpd |awk '{print$2}');do sudo kill -9 $pid; done
+sudo launchctl unload -w /System/Library/LaunchDaemons/org.apache.httpd.plist
+
+##Build new apache
+brew tap djl/homebrew-apache2
+brew install djl/apache2/apache24
+echo 'httpd="/usr/local/Cellar/apache24/2.4.9/bin/httpd/httpd"' >> ~/.bash_profile && exec bash
+
+  ==> Downloading https://downloads.sf.net/project/machomebrew/Bottles/pcre-8.35.mavericks.b
+  ######################################################################## 100.0%
+  ==> Pouring pcre-8.35.mavericks.bottle.tar.gz
+  ?  /usr/local/Cellar/pcre/8.35: 146 files, 5.8M
+  ==> Installing apache24
+  ==> Downloading http://mirror.cc.columbia.edu/pub/software/apache/httpd/httpd-2.4.9.tar.gz
+  ######################################################################## 100.0%
+  ==> tar -xzf httpd-2.4.9-deps.tar.gz
+  ==> ./configure --prefix=/usr/local/Cellar/apache24/2.4.9 --mandir=/usr/local/Cellar/apach
+  ==> make
+  ==> make install
+  ?  /usr/local/Cellar/apache24/2.4.9: 1379 files, 27M, built in 95 seconds
+  bash-3.2$
+
+ sudo atom /System/Library/LaunchDaemons/org.apache.httpd.plist
+
+  <?xml version="1.0" encoding="UTF-8"?>
+  <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+  <plist version="1.0">
+  <dict>
+  	<key>Disabled</key>
+  	<true/>
+  	<key>Label</key>
+    <string>org.apache.httpd</string>
+  	<key>EnvironmentVariables</key>
+  	<dict>
+  		<key>XPC_SERVICES_UNAVAILABLE</key>
+  		<string>1</string>
+  	</dict>
+  	<key>ProgramArguments</key>
+  	<array>
+-->   <string>/usr/local/Cellar/apache24/2.4.9/bin/httpd</string>
+  		<string>-D</string>
+  		<string>FOREGROUND</string>
+  	</array>
+  	<key>OnDemand</key>
+  	<false/>
+  </dict>
+  </plist>
+
+terminal exit/restart (exec bash does NOT work here)
+
+sudo mkdir /usr/local/etc/apache2/available &&\
+sudo echo -e "\nInclude /usr/local/etc/apache2/*.conf" >> /usr/local/etc/apache2/httpd.conf
+
+sudo apachectl restart
+
+[ ! -z  "$(apachectl -M |grep 'so_module')" ] || {
+  exit # fucking broke it, backtrack later
+}
+
+cd /tmp && wget http://www.caucho.com/download/resin-pro-3.2.1.tar.gz
+tar -zxf resin-3.2.1.tar.gz && cd resin-3.2.1
+
+  cd modules/c/src/apache2/
+  sed -e s/remote_ip/client_ip/g       \
+      -e s/remote_addr/client_addr/g   \
+      mod_caucho.c > mod_caucho.b
+
+  mv mod_caucho.b mod_caucho.c
+
+  ./configure                               \
+     --quiet                                        \
+     --enable-debug                                 \
+     --prefix=`pwd`                                 \
+     --with-apache=/usr/local/Cellar/apache24/2.4.9 \
+     --with-java-home=$JAVA_HOME                    \
+     --with-apxs=/usr/local/bin/apxs
+
+  make && sudo make install
+
+
+#######
+
+nano $(which resin)
+
+  > export JAVA_HOME=$(/usr/libexec/java_home)
+
+
+
+cd /usr/local/etc/apache2/available/
+ln -s /Users/jondaniel/Eclipse/backups/ZaneRay/filson/setup/apache/filson.com/zrdeskdev/filson-vhost.conf `pwd`/
+
+>>>> P:/ {samba client} #192.168.100.40
+>>>> #map jond to share
+
+cat filson-vhost.conf \
+|perl -C -e 'use utf8;' -pe 's#t:/#/Users/jondaniel/Eclipse/CVSZR/#i' \
+|perl -C -e 'use utf8;' -pe 's#s:/#/Users/jondaniel/Eclipse/CVSZR/#i' \
+|perl -C -e 'use utf8;' -pe 's#p:/#/Users/jondaniel/Eclipse/CVSZR/#i' \
+> filson-vhost.bak
+
+mv filson-vhost.bak filson-vhost.conf
+
+load mod_ssl and mod_rewrite
+mkdir -p /usr/local/Cellar/apache24/2.4.9/logs
+
+################
+
+
+Other helpful stuff
+
+## BASH 4.3
+brew install bash ## installs BASH 4.3
+su -
+echo '/usr/local/bin/bash' >> /etc/shells
+chsh -s /usr/local/bin/bash `WHOAMI`
+exit ## leave su
+chsh -s /usr/local/bin/bash `WHOAMI`
+
+## relaunch terminal
+echo $BASH_VERSION
+
+## install wget
+brew install wget --enable-iri
+
+## Tree and Process Tree
+brew install tree
+brew install pstree
