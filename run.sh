@@ -2,16 +2,36 @@
 # Run Resin server without interation
 
 # CPR : Jd Daniel :: Ehime-ken
-# MOD : 2014-06-25 @ 13:50:52
-# INP : $ run
+# MOD : 2014-06-27 @ 13:56:46
+# INP : $ connect|disconnect
 
 
 ###############################
 ###############################
 
-function run () 
+function disconnect ()
+{
+    sudo killall -9 java netextender
+    rPID=$(ps aux |grep 'run_resin' |grep -v grep|awk '{print$2}')
+    [ ! -z "${rPID}" ] && {
+      sudo kill -9 $rPID
+    }
+
+    sudo killall -HUP mDNSResponder
+
+    ## kill mDNSResponder again
+    rPID=$(ps aux |grep 'mDNS' |grep -v grep |awk '{print$2}')
+    [ ! -z "${rPID}" ] && {
+      sudo kill -9 $rPID
+    }
+}
+
+
+function connect () 
 {
   clear
+
+  `disconnect` ## code reuse
 
   osascript 2>/dev/null <<EOF
     tell application "System Events"
