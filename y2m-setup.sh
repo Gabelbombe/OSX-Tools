@@ -12,4 +12,17 @@
 	brew install youtube-dl
 }
 
-
+brew install ffmpeg 		\
+	--with-fdk-aac			\
+	--with-ffplay			\
+	--with-libass			\
+	--with-libvidstab		\
+	--with-libvo-aacenc		\
+	--with-libvorbis		\
+	--with-libvpx			\
+	--with-opencore-amr		\
+	--with-openssl			\
+	--with-opus				\
+	--with-theora			\
+	--with-tools			\
+	--with-x265
