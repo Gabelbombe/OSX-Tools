@@ -13,7 +13,7 @@ echo -e 'if [ -f ~/.bash_profile ]; then\n  . ~/.bash_profile\nfi' >> ~/.bashrc
 
 
 ## Brew stuff
-ruby -e "$(curl -fsSL https://raw.github.com/Homebrew/homebrew/go/install)"
+ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 echo -e 'export PATH="$(brew --prefix coreutils)/libexec/gnubin:/usr/local/bin:$PATH"' >> ~/.bashrc
 
 
