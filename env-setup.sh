@@ -144,5 +144,7 @@ brew cask install vagrant
 
 
 
-pki='http://dp.t-mobile.com/pki/'
+##pki='http://dp.t-mobile.com/pki/'
+##sudo security add-trusted-cert -d -r trustRoot -k "/Library/Keychains/System.keychain" "/private/tmp/certs/certname.cer"
+
 
