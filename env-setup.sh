@@ -11,16 +11,37 @@ if [[ $EUID -ne 0 ]]; then
   echo "This script must be run as su" 1>&2 ; exit 1
 fi
 
+## Maintenance mode
+[ ! -f '/tmp/.reparing'] && {
 
-## Stage profile
-echo -e 'if [ -f ~/.bash_aliases ]; then\n  . ~/.bash_aliases\nfi' >> ~/.bashrc
-curl -X GET https://raw.githubusercontent.com/ehime/Bash-Tools/master/.generic-bash_aliases >> ~/.bash_aliases
-echo -e 'if [ -f ~/.bash_profile ]; then\n  . ~/.bash_profile\nfi' >> ~/.bashrc
+  ## Stage profile
+  echo -e 'if [ -f ~/.bash_aliases ]; then\n  . ~/.bash_aliases\nfi' >> ~/.bashrc
+  curl -X GET https://raw.githubusercontent.com/ehime/Bash-Tools/master/.generic-bash_aliases >> ~/.bash_aliases
+  echo -e 'if [ -f ~/.bash_profile ]; then\n  . ~/.bash_profile\nfi' >> ~/.bashrc
 
 
-## Brew stuff
-ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-echo -e 'export PATH="$(brew --prefix coreutils)/libexec/gnubin:/usr/local/bin:$PATH"' >> ~/.bashrc
+  ## Brew stuff
+  ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+  echo -e 'export PATH="$(brew --prefix coreutils)/libexec/gnubin:/usr/local/bin:$PATH"' >> ~/.bashrc
+
+
+  ## Detect Brew issues
+  brew doctor
+
+  read -p "Need to correct Brew? [Y\n] " brew_fix
+
+  [ 'y' == $(echo ${brew_fix,,}) ] && {
+    touch '/tmp/.repairing' ## repair flag
+    echo '-- Stopping to repair Brew'
+    exit
+  }
+} || {
+  echo '-- Resuming...'
+  rm -f '/tmp/.repairing'
+}
+
+## Update Brew
+brew update
 
 
 ## GNU Utilities
@@ -138,13 +159,47 @@ install_dmg "Puppet" "${PUPPET_PACKAGE_URL}"
 defaults write /Library/Preferences/com.apple.loginwindow Hide500Users -bool YES
 
 
-## Cask install VBox and Vagrant
+set +e  ## Exit if SHTF
+
+## Cask install VBox and Vagranto
+echo "-- Installing VirtualBox and Vagrant"
 brew cask install virtualbox
 brew cask install vagrant
 
 
+echo "-- Installing R10k For Puppet"
+gem install r10k
 
-##pki='http://dp.t-mobile.com/pki/'
-##sudo security add-trusted-cert -d -r trustRoot -k "/Library/Keychains/System.keychain" "/private/tmp/certs/certname.cer"
 
+    ## Add the list of used Vagrant boxes
+    declare -A boxes
+    inc=1
+
+    boxes=(
+      ['spherical64']='http://puppet-vagrant-boxes.puppetlabs.com/fedora-18-x64-vbox4210-nocm.box'          ## Fedora           18      x64 nocm
+      ['centos6464']='http://puppet-vagrant-boxes.puppetlabs.com/centos-64-x64-vbox4210-nocm.box'           ## CentOS           6.4     x64 nocm
+      ['centos5964']='http://puppet-vagrant-boxes.puppetlabs.com/centos-59-x64-vbox4210-nocm.box'           ## CentOS           5.9     x64 nocm
+      ['squeeze64']='http://puppet-vagrant-boxes.puppetlabs.com/debian-607-x64-vbox4210-nocm.box'           ## Debian           6.0.7   x64 nocm
+      ['wheezy64']='http://puppet-vagrant-boxes.puppetlabs.com/debian-70rc1-x64-vbox4210-nocm.box'          ## Debian           7.0rc1  x64 nocm
+      ['sles11164']='http://puppet-vagrant-boxes.puppetlabs.com/sles-11sp1-x64-vbox4210-nocm.box'           ## SUSE Enterprise  11sp1   x64 nocm
+      ['lucid64']='http://puppet-vagrant-boxes.puppetlabs.com/ubuntu-server-10044-x64-vbox4210-nocm.box'    ## Ubuntu Server    10.04.4 x64 nocm
+      ['precise64']='http://puppet-vagrant-boxes.puppetlabs.com/ubuntu-server-12042-x64-vbox4210-nocm.box'  ## Ubuntu Server    12.04.2 x64 nocm
+    )
+
+    set -e
+
+    for box in "${!boxes[@]}"; do
+      echo "-- Installing: ${inc}/${#boxes[@]} ${box}"
+      vagrant box add "${box}" "${boxes[$box]}"
+
+      echo "-- Updating: ${box}"
+      vagrant box update "${box}" "${boxes[$box]}"
+
+      ((inc+=1))
+    done
+
+    set +e
+
+## Add trusted certs
+#security import /tmp/MyCertificates.p12 -k $HOME /Library/Keychains/login.keychain -P -T /usr/bin/codesign
 
