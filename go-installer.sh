@@ -11,5 +11,5 @@ brew doctor
 brew install hg go
 
 [ -d $HOME/go ] || mkdir $HOME/go
-echo -e 'export GOPATH=$HOME/go\nexport PATH="$GOPATH/bin:$PATH"\nexport PATH="$PATH:/usr/local/opt/go/libexec/bin"' >> .bash_profile
+echo -e 'export GOPATH=$HOME/go\nexport PATH="$GOPATH/bin:$PATH"\nexport PATH="$PATH:/usr/local/opt/go/libexec/bin"' >> $HOME/.bashrc
 echo "Installation complete...."
