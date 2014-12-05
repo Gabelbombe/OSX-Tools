@@ -5,6 +5,8 @@
 # MOD : 2014-12-05 @ 10:54:55
 # VER : Version 4 (OSX Darwin)
 
+# DEP : http://goo.gl/7YeHib
+
 # no long-opts supported except --help
 while getopts 'v:d:-:' OPT; do
   case $OPT in
@@ -13,8 +15,8 @@ while getopts 'v:d:-:' OPT; do
     -) #long option
        case $OPTARG in
 
-         help) echo 'Long:  y2m -d {directory} -v {ex: http://www.youtube.com/watch?v=oHg5SJYRHA0‎}'
-           echo 'Short: y2m {ex: http://www.youtube.com/watch?v=oHg5SJYRHA0‎}'
+         help) 
+           echo -e 'Welcome to Youtube to MP3!\n\nUsage:\nLong:  y2m -d {directory} -v {ex: http://www.youtube.com/watch?v=oHg5SJYRHA0‎}\nShort: y2m {ex: http://www.youtube.com/watch?v=oHg5SJYRHA0‎}\n'
            exit;;
 
        esac;;
