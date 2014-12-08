@@ -43,8 +43,8 @@ if [[ $address =~ $regex ]]; then
   FILENAME=$(basename "$FILEPATH")
   EXTENSION="${FILENAME##*.}"
 
-  if [ $video_id != "*" ]
-  then
+  ## Very much unused atm....
+  if [ $video_id != "*" ]; then
     DATA=`curl -s https://gdata.youtube.com/feeds/api/videos/$video_id?v=2`
     PUBLISHED=`echo $DATA | php -r 'print simplexml_load_file("php://stdin")->published;' | sed 's/\..*Z/Z/'`
     AUTHOR=`echo $DATA | php -r 'print simplexml_load_file("php://stdin")->author->name;'`
@@ -53,14 +53,13 @@ if [[ $address =~ $regex ]]; then
     COMMENT="http://www.youtube.com/watch?v=$YOUTUBE_ID"
     ALBUM=$AUTHOR
 
-    if [ "$1" ]
-    then
+    if [ "$1" ]; then
       TITLE="$AUTHOR: $TITLE"
       AUTHOR=$1
       ALBUM=$1
     fi
+  fi
 
-fi
     # adding thumbnail to the MP3
     thumb="$(youtube-dl --write-thumbnail $address |grep "to:.*" |awk '{for(i=6;i<=NF;i++) printf $i" "}')"
     set -- $thumb; thumb=$*
