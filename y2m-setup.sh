@@ -1,14 +1,9 @@
 #!/bin/bash
 # Youtube to MP3 OSX Support installer
- 
-# CPR : Jd Daniel :: Ehime-ken
-# MOD : 2014-12-05 @ 10:54:55
-# VER : Version 2 (OSX Darwin)
 
-## ROOT check
-if [[ $EUID -ne 0 ]]; then
-  echo "This script must be run as su..." 1>&2 ; exit 1
-fi
+# CPR : Jd Daniel :: Ehime-ken
+# MOD : 2017-04-02 @ 00:10:05
+# VER : Version 2.1 (OSX Darwin)
 
 ## Install brew
 [ hash brew 2>/dev/null ] || {
@@ -38,6 +33,8 @@ brew install ffmpeg         \
 
 brew install curl
 
-cd /tmp/ && curl -sSL https://raw.githubusercontent.com/ehime/OSX-Tools/master/y2m.sh
+curl -sSL https://goo.gl/1OqKsI >| /usr/local/bin/y2m.sh
+chmod +x $_
 
-mv 'y2m.sh' /usr/local/bin/y2m
+[ 0 = $? ] { echo -e 'Fail..' ; return 1 ; } ## exit_fail 
+return 0 
