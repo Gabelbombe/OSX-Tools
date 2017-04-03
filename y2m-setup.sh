@@ -6,19 +6,19 @@
 # VER : Version 2.1 (OSX Darwin)
 
 ## Install brew
-[ hash brew 2>/dev/null ] || {
+hash brew 2>/dev/null || {
     ruby -e "$(curl -fsSL https://raw.github.com/Homebrew/homebrew/go/install)"
     brew doctor
 }
 
 ## Install youtube-dl
-[ hash youtube-dl 2>/dev/null ] || {
+hash youtube-dl 2>/dev/null || {
     brew install youtube-dl
 }
 
 brew install ffmpeg         \
     --with-fdk-aac          \
-    --with-ffplay           \
+    --with-sdl2             \
     --with-libass           \
     --with-libvidstab       \
     --with-libvo-aacenc     \
